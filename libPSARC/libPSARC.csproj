@@ -44,7 +44,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\Class1.cs" />
     <Compile Include="Source\Interop\StructLayoutInfo.cs" />
     <Compile Include="Source\Interop\Unmanaged.cs" />
     <Compile Include="Source\PSARC\BlockSizeList.cs" />
@@ -58,9 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="PSARC_Definition.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
