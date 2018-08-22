@@ -58,4 +58,11 @@
   </ItemGroup>
   <Import Project="..\libPSARC-Static\libPSARC-Static.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if "$(ConfigurationName)"=="Release" (
+  "$(SolutionDir)BuildTools\_bin\ILMerge.exe" /out:"$(TargetDir)\$(TargetName)-merged.exe"   "$(TargetPath)" "$(TargetDir)\zlib.net.dll"
+  del "$(TargetPath)"
+  move "$(TargetDir)\$(TargetName)-merged.exe" "$(TargetPath)"
+)</PostBuildEvent>
+  </PropertyGroup>
 </Project>
