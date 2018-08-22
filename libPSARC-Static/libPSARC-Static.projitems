@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>0daf63e1-088f-4360-9bef-89f373bb3d80</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>libPSARC</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Source\Interop\ByteOrder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Source\Interop\StructLayoutInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Source\Interop\Unmanaged.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Source\PSARC\Archive.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Source\PSARC\BlockSizeList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Source\PSARC\FileEntry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Source\PSARC\Header.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Source\PSARC\UInt40.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Source\Utils.cs" />
+  </ItemGroup>
+</Project>

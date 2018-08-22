@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libPSARC", "libPSARC\libPSARC.csproj", "{64965A38-701B-4780-B72D-2AB2461CA6E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libPSARC-DLL", "libPSARC-DLL\libPSARC-DLL.csproj", "{64965A38-701B-4780-B72D-2AB2461CA6E6}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "libPSARC-Static", "libPSARC-Static\libPSARC-Static.shproj", "{0DAF63E1-088F-4360-9BEF-89F373BB3D80}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cliPSARC", "cliPSARC\cliPSARC.csproj", "{1586FE0D-6A84-4065-A37F-B59E819EDD0C}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -11,6 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cliPSARC", "cliPSARC\cliPSA
 	EndProjectSection
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		libPSARC-Static\libPSARC-Static.projitems*{0daf63e1-088f-4360-9bef-89f373bb3d80}*SharedItemsImports = 13
+		libPSARC-Static\libPSARC-Static.projitems*{1586fe0d-6a84-4065-a37f-b59e819edd0c}*SharedItemsImports = 4
+		libPSARC-Static\libPSARC-Static.projitems*{64965a38-701b-4780-b72d-2ab2461ca6e6}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
