@@ -49,13 +49,10 @@ namespace libPSARC.PSARC {
         }
 
         public Archive( Stream streamIn ) {
-            if ( streamIn.Length < Marshal.SizeOf<Header>() ) throw new InvalidArchiveException();
+            if ( !Header.IsValid( streamIn ) ) throw new InvalidArchiveException();
 
             header = new Header( streamIn );
             DebugLog( header );
-
-            string magic = new string( header.magic );
-            if ( magic != Header.MAGIC ) throw new InvalidArchiveException();
 
             DebugLogPosition( streamIn.Position );
 
