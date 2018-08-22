@@ -16,6 +16,9 @@ namespace cliPSARC {
         public List<string> optionVals = new List<string>();
         public List<string> fileParams = new List<string>();
 
+        public int Count => optionKeys.Count;
+        public int FileCount => fileParams.Count;
+
         public CommandLineOptions( string[] args, string[] verbs = null, Dictionary<string, string> optionAliases = null ) {
             if ( args.Length == 0 ) return;
             aliases = optionAliases ?? new Dictionary<string, string>();
