@@ -44,8 +44,8 @@ namespace libPSARC.PSARC {
     [ByteOrder( Endian.Big )]
     [StructLayout( LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 0x04, Size = 0x20 )]
     public struct Header {
-        private const string MAGIC = "PSAR";
-        private const UInt32 VERSION = 1 << 16 + 4;
+        internal const string MAGIC = "PSAR";
+        internal const UInt32 VERSION = 1 << 16 + 4;
 
         /// <summary>Should always be "PSAR".</summary>
         [MarshalAs( UnmanagedType.ByValArray, SizeConst = 4 )]
@@ -116,6 +116,14 @@ namespace libPSARC.PSARC {
 
         public override string ToString() => ToString( null );
         public string ToString( string heading ) => StructMeta.StructToString( heading, this );
+
+        public static bool IsValid( Stream streamIn ) {
+            var position = streamIn.Position;
+            if ( streamIn.Length < Marshal.SizeOf<Header>() ) return false;
+            var header = new Header( streamIn );
+            streamIn.Position = position;
+            return (new string( header.magic ) == MAGIC);
+        }
 
         #endregion
 

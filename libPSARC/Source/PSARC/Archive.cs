@@ -7,6 +7,10 @@ using libPSARC.Interop;
 
 namespace libPSARC.PSARC {
 
+    public class InvalidArchiveException : Exception {
+        public InvalidArchiveException() : base( "Invalid archive." ) { }
+    }
+
     public class Archive {
 
         public Header header;
@@ -26,34 +30,55 @@ namespace libPSARC.PSARC {
             this.filePaths = null;
         }
 
-        public Archive( Stream streamIn ) {
-            header = new Header( streamIn );
-            Debug.WriteLine( header );
+        [Conditional( "DEBUG" )]
+        private static void DebugLog( object obj ) => Debug.WriteLine( obj );
 
-            Debug.WriteLine( String.Format( "\n0x{0:X8} ({0})\n", streamIn.Position ) );
+        [Conditional( "DEBUG" )]
+        private static void DebugLogPosition( long position ) => DebugLog( String.Format( "\n0x{0:X8} ({0})\n", position ) );
+
+        [Conditional( "DEBUG" )]
+        private static void DebugLogFileEntries( FileList fileEntries, int count ) {
+            count = Math.Min( fileEntries.Length, count );
+            for ( int i = 0; i < count; i++ ) DebugLog( fileEntries[i].ToString( $"{typeof( FileEntry )}[{i}]" ) );
+        }
+
+        [Conditional( "DEBUG" )]
+        private static void DebugLogBlockSizes( BlockSizeList blockSizes, int count ) {
+            count = Math.Min( blockSizes.Length, count );
+            for ( int i = 0; i < count; i++ ) DebugLog( $"blockSizes[{i}] = {blockSizes[i]}" );
+        }
+
+        public Archive( Stream streamIn ) {
+            if ( streamIn.Length < Marshal.SizeOf<Header>() ) throw new InvalidArchiveException();
+
+            header = new Header( streamIn );
+            DebugLog( header );
+
+            if ( header.magic.ToString() != Header.MAGIC ) throw new InvalidArchiveException();
+
+            DebugLogPosition( streamIn.Position );
 
             fileEntries = new FileList( streamIn, header.numFiles );
-            for ( int i = 0; i < 5; i++ ) Debug.WriteLine( fileEntries[i].ToString( $"{typeof( FileEntry )}[{i}]" ) );
+            DebugLogFileEntries( fileEntries, 5 );
 
-            Debug.WriteLine( String.Format( "\n0x{0:X8} ({0})\n", streamIn.Position ) );
+            DebugLogPosition( streamIn.Position );
 
             int length = (int) (header.dataOffset - streamIn.Position);
             length -= (header.flags.HasFlag( ArchiveFlags.Encrypted ) ? 0x20 : 0x00);
 
             blockSizes = new BlockSizeList( streamIn, length, header.maxBlockSize );
-            for ( int i = 0; i < 5; i++ ) Debug.WriteLine( $"blockSizes[{i}] = {blockSizes[i]}" );
+            DebugLogBlockSizes( blockSizes, 5 );
 
-            Debug.WriteLine( String.Format( "\n0x{0:X8} ({0})\n", streamIn.Position ) );
+            DebugLogPosition( streamIn.Position );
 
             filePaths = new List<string>();
-            filePaths.Add( "|MANIFEST|" );
             using ( var reader = new StreamReader( ExtractFile( streamIn, fileEntries[0] ) ) ) {
                 while ( !reader.EndOfStream ) filePaths.Add( reader.ReadLine() );
             }
         }
 
         public int GetFileIndex( string filePath ) {
-            return (filePaths.Contains( filePath )) ? filePaths.IndexOf( filePath ) : -1;
+            return (filePaths.Contains( filePath )) ? filePaths.IndexOf( filePath ) + 1 : -1;
         }
 
         public Stream ExtractFile( Stream streamIn, string filePath, Stream streamOut = null ) {
@@ -91,6 +116,8 @@ namespace libPSARC.PSARC {
             streamOut.Position = startPosition;
             return streamOut;
         }
+
+        public static bool IsValid( Stream streamIn ) => Header.IsValid( streamIn );
 
         #endregion
     }

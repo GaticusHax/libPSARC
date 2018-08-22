@@ -41,6 +41,8 @@ namespace libPSARC.PSARC {
             set => entries[index] = value;
         }
 
+        public int Length => entries.Length;
+
         #region // Methods
 
         public FileList() : this( 0 ) { }

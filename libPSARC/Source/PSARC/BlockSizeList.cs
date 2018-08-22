@@ -13,6 +13,8 @@ namespace libPSARC.PSARC {
             set => sizes[index] = value;
         }
 
+        public int Length => sizes.Length;
+
         public BlockSizeList() : this( 0 ) { }
 
         public BlockSizeList( int numBlocks ) {
