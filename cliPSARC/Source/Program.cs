@@ -107,8 +107,9 @@ namespace cliPSARC {
         }
 
         public static int ShowVersion() {
-            string exe = GetExecutableName();
-            Console.WriteLine( $"{exe} v{Assembly.GetExecutingAssembly().GetName().Version}" );
+            string version = libPSARC.Version.AssemblyVersion.ToString();
+            string versionString = $"{GetExecutableName()} v{libPSARC.Version.GetString()}";
+            Console.WriteLine( quiet ? version : versionString );
             return -1;
         }
 
@@ -124,11 +125,11 @@ namespace cliPSARC {
 
             var options = new CommandLineOptions( args, VERBS, OPTION_ALIASES );
 
-            if ( options.IsOption( "help"    ) ) return ShowHelp();
-            if ( options.IsOption( "version" ) ) return ShowVersion();
-
             quiet     = options.IsOption( "quiet" );
             overwrite = options.IsOption( "overwrite" );
+
+            if ( options.IsOption( "help"    ) ) return ShowHelp();
+            if ( options.IsOption( "version" ) ) return ShowVersion();
 
             if ( options.fileParams.Count < 1 ) {
                 string arg = "<Archive> or <BaseDir>";                 // execution order matters!
