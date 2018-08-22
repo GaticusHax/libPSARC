@@ -54,7 +54,8 @@ namespace libPSARC.PSARC {
             header = new Header( streamIn );
             DebugLog( header );
 
-            if ( header.magic.ToString() != Header.MAGIC ) throw new InvalidArchiveException();
+            string magic = new string( header.magic );
+            if ( magic != Header.MAGIC ) throw new InvalidArchiveException();
 
             DebugLogPosition( streamIn.Position );
 
