@@ -52,7 +52,7 @@ namespace libPSARC.Interop {
             var typeInfo  = fieldInfo?.FieldType ?? memberInfo as TypeInfo;
             if ( typeInfo == null ) return bytes; // member is not a Field or a Type
 
-            ByteOrderAttribute endianAttr = Utils.GetAttribute<ByteOrderAttribute>( typeInfo, true) ?? new ByteOrderAttribute( defaultEndian );
+            ByteOrderAttribute endianAttr = Utils.GetAttribute<ByteOrderAttribute>( memberInfo, true) ?? new ByteOrderAttribute( defaultEndian );
             bool isEndianSwapped = ( endianAttr.IsLittleEndian != BitConverter.IsLittleEndian );
 
             if ( typeInfo.IsPrimitive ) {
