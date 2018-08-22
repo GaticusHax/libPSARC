@@ -83,6 +83,16 @@ namespace cliPSARC {
             return val;
         }
 
+        public List<string> GetOptions( string key ) {
+            var list = new List<string>();
+            var param = GetOption( key );
+            while (param != null) {
+                list.Add( param );
+                param = GetOption( key );
+            }
+            return list;
+        }
+
         public bool IsOption( string key ) => GetOption( key ) != null;
     }
 

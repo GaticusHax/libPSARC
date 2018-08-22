@@ -49,10 +49,8 @@ namespace cliPSARC {
         private static bool quiet = false;
         private static bool overwrite = false;
 
-        private static string listFile = "";
         private static string baseDir = "";
         private static string archiveFile = "";
-        private static List<string> files = new List<string>();
 
         public static string GetExecutableName() => Path.GetFileNameWithoutExtension( Environment.GetCommandLineArgs()[0] );
 
@@ -101,6 +99,11 @@ namespace cliPSARC {
             return -1;
         }
 
+        public static int ShowError( int code, string msg ) {
+            Console.WriteLine( msg );
+            return (int) code;
+        }
+
         public static int ShowError( ErrorCode code, params string[] args ) {
             Console.WriteLine( ERROR_CODE_MESSAGES[(int) code], args );
             return (int) code;
@@ -146,86 +149,97 @@ namespace cliPSARC {
 
                 if ( options.verb == "list" ) {
                     archiveFile = options.fileParams[0];
-                    if ( !File.Exists( archiveFile ) ) return ShowError( ErrorCode.FileNotFound, archiveFile );
 
-                    if ( options.optionKeys.Count != 0 ) return ShowError( ErrorCode.InvalidArgument );
+                    if ( options.Count != 0 ) return ShowError( ErrorCode.InvalidArgument );
 
-                    using ( var fIn = new FileStream( archiveFile, FileMode.Open, FileAccess.Read ) ) {
-                        var archive = new PSARC.Archive( fIn );
-                        foreach ( var path in archive.filePaths ) Console.WriteLine( path );
-                    }
-
+                    ArchiveListFiles( archiveFile );
 
                 } else if ( options.verb == "create" ) {
                     baseDir = options.fileParams[0];
-                    if ( !Directory.Exists( baseDir ) ) return ShowError( ErrorCode.DirectoryNotFound, baseDir );
 
                     archiveFile = (options.fileParams.Count > 1) ? options.fileParams[1] : Path.GetFileNameWithoutExtension( baseDir );
                     archiveFile = options.GetOption( "output" ) ?? archiveFile;
-                    if ( File.Exists( archiveFile ) ) {
-                        if ( !overwrite ) return ShowError( ErrorCode.FileExists, archiveFile );
-                        LogOverwriteFile( archiveFile );
-                    }
 
-                    listFile = options.GetOption( "input" );
-                    if ( (listFile != null) && !File.Exists( listFile ) ) return ShowError( ErrorCode.FileNotFound, listFile );
+                    var listFile = options.GetOption( "input" );
 
                     if ( options.IsOption( "exclude" ) ) throw new NotImplementedException();
 
-                    if ( options.optionKeys.Count != 0 ) return ShowError( ErrorCode.InvalidArgument );
+                    if ( options.Count != 0 ) return ShowError( ErrorCode.InvalidArgument );
+
+                    bool exists = File.Exists( archiveFile );
+                    FileMode fileMode = overwrite ? FileMode.Create : FileMode.CreateNew;
 
                     throw new NotImplementedException();
 
+                    if (exists) LogOverwriteFile( archiveFile );
+
                 } else if ( options.verb == "extract" ) {
                     archiveFile = options.fileParams[0];
-                    if ( !File.Exists( archiveFile ) ) return ShowError( ErrorCode.FileNotFound, archiveFile );
 
                     baseDir = (options.fileParams.Count > 1) ? options.fileParams[1] : Directory.GetCurrentDirectory();
                     baseDir = options.GetOption( "output" ) ?? baseDir;
 
-                    listFile = options.GetOption( "input" );
-                    if ( listFile != null ) {
-                        if ( !File.Exists( listFile ) ) return ShowError( ErrorCode.FileNotFound, listFile );
-                        using ( var reader = new StreamReader( new FileStream( listFile, FileMode.Open, FileAccess.Read ) ) ) {
-                            while ( !reader.EndOfStream ) files.Add( reader.ReadLine() );
-                        }
-                    }
+                    var files = ReadFileList( options.GetOption( "input" ) );
+                    files.AddRange( options.GetOptions( "file" ) );
 
-                    var xFile = options.GetOption( "file" );
-                    while ( xFile != null ) {
-                        files.Add( xFile );
-                        xFile = options.GetOption( "file" );
-                    }
+                    if ( options.Count != 0 ) return ShowError( ErrorCode.InvalidArgument );
 
-                    if ( options.optionKeys.Count != 0 ) return ShowError( ErrorCode.InvalidArgument );
-
-                    using ( var fIn = new FileStream( archiveFile, FileMode.Open, FileAccess.Read ) ) {
-                        var archive = new PSARC.Archive( fIn );
-
-                        if ( files.Count == 0 ) foreach ( var path in archive.filePaths ) files.Add( path ); // extract all
-
-                        foreach ( var file in files ) {
-                            string fileName = Path.GetFileName( file );
-                            string path = file.Remove( file.Length - fileName.Length );
-                            Directory.CreateDirectory( Path.Combine( baseDir, path ) );
-                            var filePath = Path.GetFullPath( Path.Combine( baseDir, file ) );
-                            bool exists = File.Exists( filePath );
-                            if ( !overwrite && exists ) return ShowError( ErrorCode.FileExists, filePath );
-                            using ( var fOut = new FileStream( filePath, FileMode.Create, FileAccess.Write ) ) {
-                                LogInfo( $"extracting {file}" );
-                                archive.ExtractFile( fIn, file, fOut );
-                                if ( exists ) LogOverwriteFile( filePath );
-                            }
-                        }
-                    }
+                    ArchiveExtractFiles( archiveFile, baseDir, files );
                 }
 
-            } catch (PSARC.InvalidArchiveException) {
+            } catch ( PSARC.InvalidArchiveException ) {
                 return ShowError( ErrorCode.InvalidArchive, archiveFile );
+            } catch ( IOException e ) {
+                return ShowError( (int) ErrorCode.FileExists, e.Message );
             }
 
             return 0;
         }
 
+        private static void ArchiveListFiles( string archiveFile ) {
+            using ( var fIn = new FileStream( archiveFile, FileMode.Open, FileAccess.Read ) ) {
+                var archive = new PSARC.Archive( fIn );
+                foreach ( var path in archive.filePaths ) Console.WriteLine( path );
+            }
+        }
+
+        private static void ArchiveExtractFiles( string archiveFile, string baseDir, List<string> files ) {
+            using ( var fIn = new FileStream( archiveFile, FileMode.Open, FileAccess.Read ) ) {
+                var archive = new PSARC.Archive( fIn );
+
+                // if no files were specified then extract all
+                if ( files.Count == 0 ) foreach ( var path in archive.filePaths ) files.Add( path );
+
+                foreach ( var file in files ) ArchiveExtractFile( archive, fIn, baseDir, file );
+            }
+        }
+
+        private static void ArchiveExtractFile( PSARC.Archive archive, Stream streamIn, string baseDir, string file ) {
+            CreateDirectory( baseDir, file );
+            var filePath = Path.GetFullPath( Path.Combine( baseDir, file ) );
+            bool exists = File.Exists( filePath );
+            FileMode fileMode = overwrite ? FileMode.Create : FileMode.CreateNew;
+            using ( var fOut = new FileStream( filePath, fileMode, FileAccess.Write ) ) {
+                LogInfo( $"extracting {file}" );
+                archive.ExtractFile( streamIn, file, fOut );
+                if ( exists ) LogOverwriteFile( filePath );
+            }
+        }
+
+        private static List<string> ReadFileList( string listFile ) {
+            var files = new List<string>();
+            if ( listFile == null ) return files;
+            using ( var reader = new StreamReader( new FileStream( listFile, FileMode.Open, FileAccess.Read ) ) ) {
+                while ( !reader.EndOfStream ) files.Add( reader.ReadLine() );
+            }
+            return files;
+        }
+
+        // Make sure the path to file exists.
+        private static void CreateDirectory( string baseDir, string path ) {
+            string fileName = Path.GetFileName( path );
+            path = path.Remove( path.Length - fileName.Length );
+            Directory.CreateDirectory( Path.Combine( baseDir, path ) );
+        }
     }
 }
