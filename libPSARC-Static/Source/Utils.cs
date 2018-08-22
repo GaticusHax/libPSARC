@@ -15,9 +15,7 @@ namespace libPSARC {
 
         public static char[] BytesToChars( byte[] bytes, int length = 0 ) {
             if ( length == 0 ) length = bytes.Length;
-            char[] chars = new char[length];
-            for ( int i = 0; i < length; i++ ) chars[i] = (char) bytes[i];
-            return chars;
+            return Encoding.ASCII.GetChars( bytes, 0, length );
         }
 
         public static string BytesToString( byte[] bytes, int length = 0 ) {
