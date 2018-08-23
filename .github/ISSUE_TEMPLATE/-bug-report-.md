@@ -1,5 +1,5 @@
 ---
-name: Bug report
+name: "[Bug Report]"
 about: Create a bug report to submit information about program errors, unpexpected
   behaviours and other unintended mistakes.
 
