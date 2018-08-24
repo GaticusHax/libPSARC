@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace libPSARC {
@@ -8,22 +10,36 @@ namespace libPSARC {
 
         #region // Byte Conversions
 
-        public static string BytesToHex( byte[] bytes, int length = 0 ) {
-            if ( length == 0 ) length = bytes.Length;
-            return BitConverter.ToString( bytes, 0, length ).Replace( '-', ' ' );
+        public static unsafe byte[] HexToBytes( string hex, uint stride=3 ) {
+            if ( stride < 2 ) throw new ArgumentOutOfRangeException( "stride must be >= 2" );
+            int len = hex?.Length ?? 0;
+            byte[] bytes = new byte[len / stride + (((len % stride) > 1) ? 1 : 0)];
+            fixed( byte* lpbytes = bytes)
+            fixed( char* lphex = hex) {
+                if ( lphex == null ) return bytes;
+                char* eol = lphex + len;
+                byte* b = lpbytes;
+                for ( char* c = lphex; c < eol; c += stride, b++ ) {
+                    int hi = *c; int lo = *(c + 1);
+                    hi -= ( ( hi < 'A' ) ? '0' : ( ( ( hi < 'a' ) ? 'A' : 'a' ) - 0xA ) );
+                    lo -= ( ( lo < 'A' ) ? '0' : ( ( ( lo < 'a' ) ? 'A' : 'a' ) - 0xA ) );
+                    *b = (byte) ((hi << 4) + lo);
+                };
+            }
+            return bytes;
         }
 
-        public static char[] BytesToChars( byte[] bytes, int length = 0 ) {
-            if ( length == 0 ) length = bytes.Length;
-            return Encoding.ASCII.GetChars( bytes, 0, length );
+        [ExcludeFromCodeCoverage] public static string BytesToHex( byte[] bytes ) => BytesToHex( bytes, 0 );
+        [ExcludeFromCodeCoverage] public static string BytesToHex( byte[] bytes, int startIndex ) => BytesToHex( bytes, startIndex, bytes.Length );
+        public static string BytesToHex( byte[] bytes, int startIndex, int length ) {
+            return BitConverter.ToString( bytes, startIndex, length ).Replace( '-', ' ' );
         }
 
-        public static string BytesToString( byte[] bytes, int length = 0 ) {
-            if ( length == 0 ) length = bytes.Length;
-            return Encoding.ASCII.GetString( bytes, 0, length );
+        public static unsafe string BytesToHex( byte* lpbytes, int startIndex, int length ) {
+            byte[] bytes = new byte[length];
+            Marshal.Copy( new IntPtr( lpbytes + startIndex ), bytes, startIndex, length );
+            return BytesToHex( bytes, startIndex, length );
         }
-
-        public static UInt32 BytesToUInt32( byte[] bytes ) => BitConverter.ToUInt32( bytes, 0 );
 
         #endregion
 
@@ -31,8 +47,7 @@ namespace libPSARC {
 
         public static T GetAttribute<T>( MemberInfo member, bool inherit ) where T : Attribute {
             var attributes = (T[]) member.GetCustomAttributes( typeof( T ), inherit );
-            if ( attributes.Length > 0 ) return attributes[0];
-            return null;
+            return attributes.Length > 0 ? attributes[0] : null;
         }
 
         #endregion

@@ -34,7 +34,7 @@ namespace libPSARC.PSARC {
         private static void DebugLog( object obj ) => Debug.WriteLine( obj );
 
         [Conditional( "DEBUG" )]
-        private static void DebugLogPosition( long position ) => DebugLog( String.Format( "\n0x{0:X8} ({0})\n", position ) );
+        private static void DebugLogPosition( long position ) => DebugLog( string.Format( "\n0x{0:X8} ({0})\n", position ) );
 
         [Conditional( "DEBUG" )]
         private static void DebugLogFileEntries( FileList fileEntries, int count ) {
@@ -96,7 +96,7 @@ namespace libPSARC.PSARC {
 
             streamIn.Seek( (long) fileEntry.dataOffset.Value, SeekOrigin.Begin );
 
-            streamOut = streamOut ?? new MemoryStream( (int) (UInt64) fileEntry.fileSize );
+            streamOut = streamOut ?? new MemoryStream( (int) (ulong) fileEntry.fileSize );
             long startPosition = streamOut.Position;
 
             // loop until all blocks have been read

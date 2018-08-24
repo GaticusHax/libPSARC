@@ -11,18 +11,17 @@ namespace libPSARC {
     [ByteOrder( Endian.Big )]
     [StructLayout( LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 0x01, Size = 0x05 )]
     public struct UInt40 {
-        public Byte High;
-        public UInt32 Low;
+        public byte high;
+        public uint low;
 
-        public UInt64 Value => (UInt64) (High << 32) + Low;
+        public ulong Value => (ulong) (high << 32) + low;
 
-        public static implicit operator UInt64( UInt40 tVal ) => tVal.Value;
+        public static implicit operator ulong( UInt40 tVal ) => tVal.Value;
 
-        public static explicit operator UInt40( UInt64 val ) {
-            return new UInt40 { High = (Byte) ((val >> 32) & 0xFF), Low = (UInt32) val };
-        }
+        public static explicit operator UInt40( ulong val )
+                => new UInt40 { high = (byte) ( ( val >> 32 ) & 0xFF ), low = (uint) val };
 
-        public override string ToString() => ((UInt64) this).ToString();
+        public override string ToString() => ((ulong) this).ToString();
 
     }
 

@@ -1,4 +1,6 @@
-﻿namespace libPSARC {
+﻿using System;
+
+namespace libPSARC {
 
     /// <summary>Version Utilities</summary>
     public static class Version {
@@ -13,7 +15,7 @@
         // if the prerelease version is not 0, then the build is a (development) prerelease.
         //
         // First version is 0.1.0.1
-        // 
+        //
         // When the Major version is incremented:
         //      the Minor version should be reset to 0
         // When the Minor version is reset or incremented:
@@ -23,18 +25,21 @@
         // When the Patch version is reset or incremented:
         //      the Prerelease version should be reset to 1
         //
-        public const string VERSION_STRING = "0.1.0.1";
+        internal const string VERSION_STRING = "0.1.0.1";
 
-        /// <summary>Shorthand for AssemblyVersion.Major</summary>
+        /// <summary>Gets AssemblyVersion.Major</summary>
         public static int Major      => AssemblyVersion.Major;
-        /// <summary>Shorthand for AssemblyVersion.Minor</summary>
+
+        /// <summary>Gets AssemblyVersion.Minor</summary>
         public static int Minor      => AssemblyVersion.Minor;
-        /// <summary>Shorthand for AssemblyVersion.Build</summary>
+
+        /// <summary>Gets AssemblyVersion.Build</summary>
         public static int Patch      => AssemblyVersion.Build;
-        /// <summary>Shorthand for AssemblyVersion.Revision</summary>
+
+        /// <summary>Gets AssemblyVersion.Revision</summary>
         public static int Prerelease => AssemblyVersion.Revision;
 
-        /// <summary>The assembly version.</summary>
+        /// <summary>Gets the assembly version.</summary>
         public static System.Version AssemblyVersion => new System.Version( VERSION_STRING );
 
         /// <summary>
@@ -44,7 +49,7 @@
         ///     If the current assembly version is a prerelease (Prerelease is not 0) then "-pre{Prerelease}" is returned.
         ///     Otherwise returns an emptry string.
         /// </returns>
-        public static string GetSuffix() => (Prerelease != 0) ? $"-pre{Prerelease}" : "";
+        public static string GetSuffix() => (Prerelease != 0) ? $"-pre{Prerelease}" : string.Empty;
 
         /// <summary>
         ///     Returns the assembly version in a human-readable string format.

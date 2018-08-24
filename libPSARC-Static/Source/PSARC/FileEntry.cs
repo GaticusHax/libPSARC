@@ -12,10 +12,10 @@ namespace libPSARC.PSARC {
 
         [MarshalAs( UnmanagedType.ByValArray, SizeConst = 0x10 )]
         [StructMeta( ToStringMethod = "_nameDigestToString" )]
-        /* 0x00 [0x10] */ public Byte[] nameDigest;
+        /* 0x00 [0x10] */ public byte[] nameDigest;
         private string _nameDigestToString() => Utils.BytesToHex( this.nameDigest );
 
-        /* 0x10 [0x04] */ public Int32 blockIndex;
+        /* 0x10 [0x04] */ public int blockIndex;
 
         /// <summary>The size of the uncompressed file.</summary>
         /* 0x14 [0x05] */ public UInt40 fileSize;
@@ -47,9 +47,7 @@ namespace libPSARC.PSARC {
 
         public FileList() : this( 0 ) { }
 
-        public FileList( uint numFiles ) {
-            entries = new FileEntry[numFiles];
-        }
+        public FileList( uint numFiles ) => entries = new FileEntry[numFiles];
 
         public FileList( Stream streamIn, uint numFiles ) : this( numFiles ) {
             for ( int i = 0; i < numFiles; i++ ) {

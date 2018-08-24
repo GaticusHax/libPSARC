@@ -42,17 +42,16 @@ namespace libPSARC.Interop {
             streamOut.Write( bytes, 0, bytes.Length );
         }
 
-        public static Int32 OffsetOf( Type type, string fieldName, bool inherit = true ) {
-            return Marshal.OffsetOf( type, fieldName ).ToInt32();
-        }
+        public static int OffsetOf( Type type, string fieldName, bool inherit = true )
+                => Marshal.OffsetOf( type, fieldName ).ToInt32();
 
-        public static Int32 SizeOf( MemberInfo member ) {
+        public static int SizeOf( MemberInfo member ) {
             var fieldInfo = member as FieldInfo;
             var typeInfo = fieldInfo?.FieldType ?? member;
             var type = (Type) typeInfo;
 
             if (type.IsArray) {
-                Int32 length = Utils.GetAttribute<MarshalAsAttribute>( member, true )?.SizeConst ?? 1;
+                int length = Utils.GetAttribute<MarshalAsAttribute>( member, true )?.SizeConst ?? 1;
                 return SizeOf( type.GetElementType() ) * length;
             } else if ( type.IsEnum ) {
                 return SizeOf( type.GetEnumUnderlyingType() );

@@ -11,7 +11,7 @@ namespace libPSARC.Interop {
                    | AttributeTargets.Field | AttributeTargets.Property, Inherited = true )]
     public class StructMetaAttribute : Attribute {
 
-        public String ToStringMethod { get; set; }
+        public string ToStringMethod { get; set; }
 
     }
 
@@ -20,14 +20,14 @@ namespace libPSARC.Interop {
         public struct FieldData {
 
             public Type  type;
-            public Int32 offset;
-            public Int32 size;
+            public int offset;
+            public int size;
 
         }
 
-        public class FieldMap : Dictionary<String, FieldData> {
+        public class FieldMap : Dictionary<string, FieldData> {
             public Type structType;
-            public Int32 structSize;
+            public int structSize;
 
             public FieldMap( Type type ) {
                 this.structType = type;
@@ -94,8 +94,8 @@ namespace libPSARC.Interop {
             return fieldMap;
         }
 
-        public static string StructToString<T>( Dictionary<String, Object> keyValuePairs ) where T : struct => StructToString<T>( null, keyValuePairs );
-        public static string StructToString<T>( string heading, Dictionary<String, Object> keyValuePairs ) where T : struct {
+        public static string StructToString<T>( Dictionary<string, object> keyValuePairs ) where T : struct => StructToString<T>( null, keyValuePairs );
+        public static string StructToString<T>( string heading, Dictionary<string, object> keyValuePairs ) where T : struct {
             Type type = typeof( T );
             StringBuilder sb = new StringBuilder( $"Value of {heading ?? type.FullName}\n" );
 
@@ -119,10 +119,10 @@ namespace libPSARC.Interop {
                 var value = field.GetValue( data );
                 var toStringMethod = Utils.GetAttribute<StructMetaAttribute>( field, true )?.ToStringMethod;
                 if (toStringMethod != null) {
-                    const BindingFlags bindingFlags = BindingFlags.InvokeMethod
+                    const BindingFlags BINDING_FLAGS = BindingFlags.InvokeMethod
                                                     | BindingFlags.Public | BindingFlags.NonPublic
                                                     | BindingFlags.Instance | BindingFlags.Static;
-                    value = type.InvokeMember( toStringMethod, bindingFlags, null, data, null );
+                    value = type.InvokeMember( toStringMethod, BINDING_FLAGS, null, data, null );
                 }
                 keyValuePairs[field.Name] = value;
             }
