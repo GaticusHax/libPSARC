@@ -1,0 +1,4 @@
+[submodule "Documentation/gh-pages"]
+	path = Documentation/gh-pages
+	url = https://github.com/Fuzzy-Logik/libPSARC.git
+	branch = gh-pages
