@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Documentation", "Documentation\Documentation.csproj", "{804F32D4-83A4-42C2-8E82-12790035FBE6}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		libPSARC-Static\libPSARC-Static.projitems*{0daf63e1-088f-4360-9bef-89f373bb3d80}*SharedItemsImports = 13
@@ -36,6 +38,10 @@ Global
 		{1586FE0D-6A84-4065-A37F-B59E819EDD0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1586FE0D-6A84-4065-A37F-B59E819EDD0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1586FE0D-6A84-4065-A37F-B59E819EDD0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{804F32D4-83A4-42C2-8E82-12790035FBE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{804F32D4-83A4-42C2-8E82-12790035FBE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{804F32D4-83A4-42C2-8E82-12790035FBE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{804F32D4-83A4-42C2-8E82-12790035FBE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

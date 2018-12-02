@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{804F32D4-83A4-42C2-8E82-12790035FBE6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Documentation</RootNamespace>
+    <AssemblyName>Documentation</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Build\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Build\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="api\index.md" />
+    <None Include="articles\intro.md" />
+    <None Include="articles\toc.md" />
+    <None Include="docfx.json" />
+    <None Include="filterConfig.yml" />
+    <None Include="index.md" />
+    <None Include="packages.config" />
+    <None Include="templates\default\conceptual.html.primary.tmpl" />
+    <None Include="templates\default\fonts\glyphicons-halflings-regular.eot" />
+    <None Include="templates\default\fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="templates\default\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="templates\default\fonts\glyphicons-halflings-regular.woff2" />
+    <None Include="templates\default\layout\_master.tmpl" />
+    <None Include="templates\default\ManagedReference.html.primary.tmpl" />
+    <None Include="templates\default\partials\affix.tmpl.partial" />
+    <None Include="templates\default\partials\breadcrumb.tmpl.partial" />
+    <None Include="templates\default\partials\class.header.tmpl.partial" />
+    <None Include="templates\default\partials\class.tmpl.partial" />
+    <None Include="templates\default\partials\classSubtitle.tmpl.partial" />
+    <None Include="templates\default\partials\customMREFContent.tmpl.partial" />
+    <None Include="templates\default\partials\dd-li.tmpl.partial" />
+    <None Include="templates\default\partials\enum.tmpl.partial" />
+    <None Include="templates\default\partials\footer.tmpl.partial" />
+    <None Include="templates\default\partials\head.tmpl.partial" />
+    <None Include="templates\default\partials\li.tmpl.partial" />
+    <None Include="templates\default\partials\logo.tmpl.partial" />
+    <None Include="templates\default\partials\namespace.tmpl.partial" />
+    <None Include="templates\default\partials\namespaceSubtitle.tmpl.partial" />
+    <None Include="templates\default\partials\navbar.tmpl.partial" />
+    <None Include="templates\default\partials\rest.child.tmpl.partial" />
+    <None Include="templates\default\partials\rest.tmpl.partial" />
+    <None Include="templates\default\partials\scripts.tmpl.partial" />
+    <None Include="templates\default\partials\searchResults.tmpl.partial" />
+    <None Include="templates\default\partials\title.tmpl.partial" />
+    <None Include="templates\default\partials\toc.tmpl.partial" />
+    <None Include="templates\default\partials\uref\class.header.tmpl.partial" />
+    <None Include="templates\default\partials\uref\class.tmpl.partial" />
+    <None Include="templates\default\partials\uref\enum.tmpl.partial" />
+    <None Include="templates\default\partials\uref\parameters.tmpl.partial" />
+    <None Include="templates\default\partials\_affix.liquid" />
+    <None Include="templates\default\partials\_breadcrumb.liquid" />
+    <None Include="templates\default\partials\_footer.liquid" />
+    <None Include="templates\default\partials\_head.liquid" />
+    <None Include="templates\default\partials\_logo.liquid" />
+    <None Include="templates\default\partials\_navbar.liquid" />
+    <None Include="templates\default\partials\_scripts.liquid" />
+    <None Include="templates\default\partials\_toc.liquid" />
+    <None Include="templates\default\RestApi.html.primary.tmpl" />
+    <None Include="templates\default\search-stopwords.json" />
+    <None Include="templates\default\toc.html.tmpl" />
+    <None Include="templates\default\token.json" />
+    <None Include="templates\default\UniversalReference.html.primary.tmpl" />
+    <None Include="toc.yml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include="api\.gitignore" />
+    <Content Include="templates\default\common.js" />
+    <Content Include="templates\default\conceptual.extension.js" />
+    <Content Include="templates\default\conceptual.html.primary.js" />
+    <Content Include="templates\default\favicon.ico" />
+    <Content Include="templates\default\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="templates\default\logo.svg" />
+    <Content Include="templates\default\ManagedReference.common.js" />
+    <Content Include="templates\default\ManagedReference.extension.js" />
+    <Content Include="templates\default\ManagedReference.html.primary.js" />
+    <Content Include="templates\default\RestApi.common.js" />
+    <Content Include="templates\default\RestApi.extension.js" />
+    <Content Include="templates\default\RestApi.html.primary.js" />
+    <Content Include="templates\default\styles\docfx.css" />
+    <Content Include="templates\default\styles\docfx.js" />
+    <Content Include="templates\default\styles\docfx.vendor.css" />
+    <Content Include="templates\default\styles\docfx.vendor.js" />
+    <Content Include="templates\default\styles\lunr.js" />
+    <Content Include="templates\default\styles\lunr.min.js" />
+    <Content Include="templates\default\styles\main.css" />
+    <Content Include="templates\default\styles\main.js" />
+    <Content Include="templates\default\styles\search-worker.js" />
+    <Content Include="templates\default\toc.extension.js" />
+    <Content Include="templates\default\toc.html.js" />
+    <Content Include="templates\default\UniversalReference.common.js" />
+    <Content Include="templates\default\UniversalReference.extension.js" />
+    <Content Include="templates\default\UniversalReference.html.primary.js" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\docfx.console.2.38.1\build\docfx.console.targets" Condition="Exists('..\packages\docfx.console.2.38.1\build\docfx.console.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\docfx.console.2.38.1\build\docfx.console.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\docfx.console.2.38.1\build\docfx.console.targets'))" />
+  </Target>
+</Project>
