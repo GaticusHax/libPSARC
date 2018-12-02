@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace libPSARC.Interop {
 
-    public static class Unmanaged {
+    internal static class Unmanaged {
 
         public unsafe static T BlitStruct<T>( byte[] bytes, int offset = 0 ) where T : struct {
             T value = default( T );

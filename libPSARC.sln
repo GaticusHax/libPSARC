@@ -18,6 +18,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Documentation", "Documentation\Documentation.csproj", "{804F32D4-83A4-42C2-8E82-12790035FBE6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64965A38-701B-4780-B72D-2AB2461CA6E6} = {64965A38-701B-4780-B72D-2AB2461CA6E6}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

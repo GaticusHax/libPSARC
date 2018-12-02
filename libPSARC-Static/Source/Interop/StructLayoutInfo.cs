@@ -9,13 +9,13 @@ namespace libPSARC.Interop {
 
     [AttributeUsage( AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum
                    | AttributeTargets.Field | AttributeTargets.Property, Inherited = true )]
-    public class StructMetaAttribute : Attribute {
+    internal class StructMetaAttribute : Attribute {
 
         public string ToStringMethod { get; set; }
 
     }
 
-    public static class StructMeta {
+    internal static class StructMeta {
 
         public struct FieldData {
 

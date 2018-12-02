@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace libPSARC.Interop {
 
-    public enum Endian { Little, Big }
+    internal enum Endian { Little, Big }
 
     [AttributeUsage( AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Field | AttributeTargets.Property, Inherited = true )]
-    public class ByteOrderAttribute : Attribute {
+    internal class ByteOrderAttribute : Attribute {
 
         public Endian Endian { get; private set; }
 
@@ -24,7 +24,7 @@ namespace libPSARC.Interop {
 
     }
 
-    public static class ByteOrder {
+    internal static class ByteOrder {
 
         public static byte[] Swap( byte[] bytes, int offset, int size ) {
             //Debug.Assert( (size != 0) && ((size & (~size + 1)) == size) ); // size must be a power of two

@@ -138,4 +138,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\docfx.console.2.38.1\build\docfx.console.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\docfx.console.2.38.1\build\docfx.console.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PreBuildEvent>del /q /a-h "$(ProjectDir)\gh-pages\*"</PreBuildEvent>
+  </PropertyGroup>
 </Project>
