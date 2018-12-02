@@ -1,5 +1,5 @@
 ﻿#if DEBUG
-    //#define DEBUG_LOG
+    #define DEBUG_LOG
 #endif
 
 using System;
@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using libPSARC;
 using libPSARC.Interop;
 
@@ -14,47 +15,25 @@ using PSARC = libPSARC.PSARC;
 
 namespace cliPSARC {
 
-    public class Program {
+    internal class Program {
 
-        public enum ErrorCode {
-            Success,
-            ArgumentRequired,
-            InvalidArgument,
-            FileNotFound,
-            FileExists,
-            DirectoryNotFound,
-            DirectoryExists,
-            InvalidArchive,
-        }
+        internal static bool quiet = false;
+        internal static bool overwrite = false;
 
-        private static string[] ERROR_CODE_MESSAGES = new string[] {
-            "",
-            "No {0} argument specified!",
-            "Invalid command line argument!",
-            "File does not exist!\n\"{0}\"",
-            "File already exists!\n\"{0}\"",
-            "Directory does not exist!\n\"{0}\"",
-            "Directory already exists!\n\"{0}\"",
-            "Not a valid PSARC archive file!\n\"{0}\"",
-        };
+        internal static string baseDir = "";
+        internal static string archiveFile = "";
 
-        private static string[] VERBS = new string[] { "list", "create", "extract" };
-        private static Dictionary<string, string> OPTION_ALIASES = new Dictionary<string, string>() {
+        internal static readonly string[] VERBS = new string[] { "list", "create", "extract" };
+        internal static readonly Dictionary<string, string> OPTION_ALIASES = new Dictionary<string, string>() {
             { "h",  "help" },
             { "q",  "quiet" },
             { "y",  "overwrite" },
             { "x",  "file" },
         };
 
-        private static bool quiet = false;
-        private static bool overwrite = false;
+        private static string GetExecutableName() => Path.GetFileNameWithoutExtension( Environment.GetCommandLineArgs()[0] );
 
-        private static string baseDir = "";
-        private static string archiveFile = "";
-
-        public static string GetExecutableName() => Path.GetFileNameWithoutExtension( Environment.GetCommandLineArgs()[0] );
-
-        public static string GetHelpText() {
+        internal static string GetHelpText() {
             string exe = GetExecutableName();
             return "\nusage:\n" +
                   $"    {exe} list [<Options>] <Archive>\n" +
@@ -94,32 +73,108 @@ namespace cliPSARC {
             ;
         }
 
-        public static int ShowHelp() {
+        internal static int ShowHelp() {
             Console.WriteLine( GetHelpText() );
             return -1;
         }
 
-        public static int ShowError( int code, string msg ) {
+        internal enum ErrorCode {
+            Success,
+            ArgumentRequired,
+            InvalidArgument,
+            FileNotFound,
+            FileExists,
+            DirectoryNotFound,
+            DirectoryExists,
+            InvalidArchive,
+        }
+
+        internal static readonly string[] ERROR_CODE_MESSAGES = new string[] {
+            "",
+            "No {0} argument specified!",
+            "Invalid command line argument!",
+            "File does not exist!\n\"{0}\"",
+            "File already exists!\n\"{0}\"",
+            "Directory does not exist!\n\"{0}\"",
+            "Directory already exists!\n\"{0}\"",
+            "Not a valid PSARC archive file!\n\"{0}\"",
+        };
+
+        internal static int ShowError( int code, string msg ) {
             Console.WriteLine( msg );
             return (int) code;
         }
 
-        public static int ShowError( ErrorCode code, params string[] args ) {
+        internal static int ShowError( ErrorCode code, params string[] args ) {
             Console.WriteLine( ERROR_CODE_MESSAGES[(int) code], args );
             return (int) code;
         }
 
-        public static int ShowVersion() {
+        internal static int ShowVersion() {
             string version = libPSARC.Version.AssemblyVersion.ToString();
             string versionString = $"{GetExecutableName()} v{libPSARC.Version.GetString()}";
             Console.WriteLine( quiet ? version : versionString );
             return -1;
         }
 
-        private static void LogInfo( string msg ) { if ( !quiet ) Console.WriteLine( msg ); }
-        private static void LogOverwriteFile( string file ) => LogInfo( $"File already exists! Overwriting...\n\"{file}\"" );
+        internal static void LogInfo( string msg ) { if ( !quiet ) Console.WriteLine( msg ); }
+        internal static void LogOverwriteFile( string file ) => LogInfo( $"File already exists! Overwriting...\n\"{file}\"" );
 
-        public static int Main( string[] args ) {
+        internal static void ArchiveListFiles( string archiveFile ) {
+            using ( var fIn = new FileStream( archiveFile, FileMode.Open, FileAccess.Read ) ) {
+                var archive = new PSARC.Archive( fIn );
+
+                int count = Math.Min( 5, archive.filePaths.Count );
+                for (int i = 0; i < count; i++) {
+                    var hash = System.Security.Cryptography.MD5.Create().ComputeHash( Encoding.ASCII.GetBytes( archive.filePaths[i] ) );
+                    Console.WriteLine( Utils.BytesToHex( hash ) );
+                }
+
+                foreach ( var path in archive.filePaths ) Console.WriteLine( path );
+
+            }
+        }
+
+        internal static void ArchiveExtractFiles( string archiveFile, string baseDir, List<string> files ) {
+            using ( var fIn = new FileStream( archiveFile, FileMode.Open, FileAccess.Read ) ) {
+                var archive = new PSARC.Archive( fIn );
+
+                // if no files were specified then extract all
+                if ( files.Count == 0 ) foreach ( var path in archive.filePaths ) files.Add( path );
+
+                foreach ( var file in files ) ArchiveExtractFile( archive, fIn, baseDir, file );
+            }
+        }
+
+        internal static void ArchiveExtractFile( PSARC.Archive archive, Stream streamIn, string baseDir, string file ) {
+            CreateDirectory( baseDir, file );
+            var filePath = Path.GetFullPath( Path.Combine( baseDir, file ) );
+            bool exists = File.Exists( filePath );
+            FileMode fileMode = overwrite ? FileMode.Create : FileMode.CreateNew;
+            using ( var fOut = new FileStream( filePath, fileMode, FileAccess.Write ) ) {
+                LogInfo( $"extracting {file}" );
+                archive.ExtractFile( streamIn, file, fOut );
+                if ( exists ) LogOverwriteFile( filePath );
+            }
+        }
+
+        internal static List<string> ReadFileList( string listFile ) {
+            var files = new List<string>();
+            if ( listFile == null ) return files;
+            using ( var reader = new StreamReader( new FileStream( listFile, FileMode.Open, FileAccess.Read ) ) ) {
+                while ( !reader.EndOfStream ) files.Add( reader.ReadLine() );
+            }
+            return files;
+        }
+
+        // Make sure the path to file exists.
+        internal static void CreateDirectory( string baseDir, string path ) {
+            string fileName = Path.GetFileName( path );
+            path = path.Remove( path.Length - fileName.Length );
+            Directory.CreateDirectory( Path.Combine( baseDir, path ) );
+        }
+
+        internal static int Main( string[] args ) {
 #if DEBUG_LOG
             Debug.Listeners.Add( new TextWriterTraceListener( Console.Out ) );
 #endif
@@ -171,7 +226,7 @@ namespace cliPSARC {
 
                     throw new NotImplementedException();
 
-                    if (exists) LogOverwriteFile( archiveFile );
+                    //if (exists) LogOverwriteFile( archiveFile );
 
                 } else if ( options.verb == "extract" ) {
                     archiveFile = options.fileParams[0];
@@ -196,50 +251,5 @@ namespace cliPSARC {
             return 0;
         }
 
-        private static void ArchiveListFiles( string archiveFile ) {
-            using ( var fIn = new FileStream( archiveFile, FileMode.Open, FileAccess.Read ) ) {
-                var archive = new PSARC.Archive( fIn );
-                foreach ( var path in archive.filePaths ) Console.WriteLine( path );
-            }
-        }
-
-        private static void ArchiveExtractFiles( string archiveFile, string baseDir, List<string> files ) {
-            using ( var fIn = new FileStream( archiveFile, FileMode.Open, FileAccess.Read ) ) {
-                var archive = new PSARC.Archive( fIn );
-
-                // if no files were specified then extract all
-                if ( files.Count == 0 ) foreach ( var path in archive.filePaths ) files.Add( path );
-
-                foreach ( var file in files ) ArchiveExtractFile( archive, fIn, baseDir, file );
-            }
-        }
-
-        private static void ArchiveExtractFile( PSARC.Archive archive, Stream streamIn, string baseDir, string file ) {
-            CreateDirectory( baseDir, file );
-            var filePath = Path.GetFullPath( Path.Combine( baseDir, file ) );
-            bool exists = File.Exists( filePath );
-            FileMode fileMode = overwrite ? FileMode.Create : FileMode.CreateNew;
-            using ( var fOut = new FileStream( filePath, fileMode, FileAccess.Write ) ) {
-                LogInfo( $"extracting {file}" );
-                archive.ExtractFile( streamIn, file, fOut );
-                if ( exists ) LogOverwriteFile( filePath );
-            }
-        }
-
-        private static List<string> ReadFileList( string listFile ) {
-            var files = new List<string>();
-            if ( listFile == null ) return files;
-            using ( var reader = new StreamReader( new FileStream( listFile, FileMode.Open, FileAccess.Read ) ) ) {
-                while ( !reader.EndOfStream ) files.Add( reader.ReadLine() );
-            }
-            return files;
-        }
-
-        // Make sure the path to file exists.
-        private static void CreateDirectory( string baseDir, string path ) {
-            string fileName = Path.GetFileName( path );
-            path = path.Remove( path.Length - fileName.Length );
-            Directory.CreateDirectory( Path.Combine( baseDir, path ) );
-        }
     }
 }
