@@ -21,7 +21,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\Build\Debug\libPSARC.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,6 +43,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="zlib.net, Version=1.0.3.0, Culture=neutral, PublicKeyToken=47d7877cb3620160">
       <HintPath>..\packages\zlib.net.1.0.4.0\lib\zlib.net.dll</HintPath>
+      <HintPath>..\..\..\packages\zlib.net.1.0.4.0\lib\zlib.net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -55,10 +55,12 @@
   <Import Project="..\libPSARC-Static\libPSARC-Static.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if "$(ConfigurationName)"=="Release" (
-  "$(SolutionDir)BuildTools\_bin\ILMerge.exe" /out:"$(TargetDir)\$(TargetName)-merged.dll"   "$(TargetPath)" "$(TargetDir)\zlib.net.dll"
-  del "$(TargetPath)"
-  move "$(TargetDir)\$(TargetName)-merged.dll" "$(TargetPath)"
-)</PostBuildEvent>
+    <PostBuildEvent>rem if "$(ConfigurationName)"=="Release" (
+rem   "$(ProjectDir)..\BuildTools\_bin\ILMerge.exe" /out:"$(TargetDir)\$(TargetName)-merged$(TargetExt)" "$(TargetPath)" "$(TargetDir)\zlib.net.dll"
+rem   del "$(TargetPath)"
+rem   move "$(TargetDir)\$(TargetName)-merged$(TargetExt)" "$(TargetPath)"
+rem   del "$(TargetDir)$(TargetName).pdb"
+rem   move "$(TargetDir)\$(TargetName)-merged.pdb" "$(TargetDir)$(TargetName).pdb"
+rem )</PostBuildEvent>
   </PropertyGroup>
 </Project>
