@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
-using libPSARC.Interop;
 
 namespace libPSARC.PSARC {
 
@@ -11,8 +9,7 @@ namespace libPSARC.PSARC {
         public InvalidArchiveException() : base( "Invalid archive." ) { }
     }
 
-    public class Archive {
-
+    public class Archive : IDisposable {
         public Header header;
 
         public FileList fileEntries;
@@ -20,6 +17,9 @@ namespace libPSARC.PSARC {
         public BlockSizeList blockSizes;
 
         public List<string> filePaths;
+
+        public Stream streamIn;
+        private readonly bool keepOpen;
 
         #region // Methods
 
@@ -48,7 +48,11 @@ namespace libPSARC.PSARC {
             for ( int i = 0; i < count; i++ ) DebugLog( $"blockSizes[{i}] = {blockSizes[i]}" );
         }
 
-        public Archive( Stream streamIn ) {
+        public Archive( string archivePath, bool keepOpen = false ) : this( File.OpenRead( archivePath ), keepOpen ) { }
+        public Archive( Stream stream, bool keepOpen = false ) {
+            this.streamIn = stream;
+            this.keepOpen = keepOpen;
+
             if ( !Header.IsValid( streamIn ) ) throw new InvalidArchiveException();
 
             header = new Header( streamIn );
@@ -70,24 +74,28 @@ namespace libPSARC.PSARC {
             DebugLogPosition( streamIn.Position );
 
             filePaths = new List<string>();
-            using ( var reader = new StreamReader( ExtractFile( streamIn, fileEntries[0] ) ) ) {
+            using ( var reader = new StreamReader( ExtractFile( fileEntries[0] ) ) ) {
                 while ( !reader.EndOfStream ) filePaths.Add( reader.ReadLine() );
             }
+        }
+
+        public void Dispose() {
+            if ( !keepOpen ) streamIn.Close();
         }
 
         public int GetFileIndex( string filePath ) {
             return (filePaths.Contains( filePath )) ? filePaths.IndexOf( filePath ) + 1 : -1;
         }
 
-        public Stream ExtractFile( Stream streamIn, string filePath, Stream streamOut = null ) {
-            return ExtractFile( streamIn, GetFileIndex( filePath ), streamOut );
+        public Stream ExtractFile( string filePath, Stream streamOut = null ) {
+            return ExtractFile( GetFileIndex( filePath ), streamOut );
         }
 
-        public Stream ExtractFile( Stream streamIn, int fileIndex, Stream streamOut = null ) {
-            return ExtractFile( streamIn, fileEntries[fileIndex], streamOut );
+        public Stream ExtractFile( int fileIndex, Stream streamOut = null ) {
+            return ExtractFile( fileEntries[fileIndex], streamOut );
         }
 
-        public Stream ExtractFile( Stream streamIn, FileEntry fileEntry, Stream streamOut = null) {
+        public Stream ExtractFile( FileEntry fileEntry, Stream streamOut = null) {
             var buffer = new byte[header.maxBlockSize];
 
             int index = fileEntry.blockIndex;
