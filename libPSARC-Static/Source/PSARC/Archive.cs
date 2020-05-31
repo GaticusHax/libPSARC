@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
+
 namespace libPSARC.PSARC {
 
     public class InvalidArchiveException : Exception {
@@ -107,15 +108,20 @@ namespace libPSARC.PSARC {
             streamOut = streamOut ?? new MemoryStream( (int) (ulong) fileEntry.fileSize );
             long startPosition = streamOut.Position;
 
-            // loop until all blocks have been read
-            while (total < size) {
-                uint blockSize = blockSizes[index];
-                streamIn.Read( buffer, 0, (int) blockSize );
-                var zOut = new zlib.ZOutputStream( streamOut );
-                zOut.Write( buffer, 0, (int) blockSize );
-                zOut.Flush();
-                total += zOut.TotalOut;
-                index++;
+            //Check if block is already decompressed
+            if (blockSizes[index] == (uint) fileEntry.fileSize ) {
+                streamOut.Write( buffer, 0, (int) blockSizes[index] );
+            } else {
+                // loop until all blocks have been read
+                while ( total < size ) {
+                    uint blockSize = blockSizes[index];
+                    streamIn.Read( buffer, 0, (int) blockSize );
+                    var zOut = new zlib.ZOutputStream( streamOut );
+                    zOut.Write( buffer, 0, (int) blockSize );
+                    zOut.Flush();
+                    total += zOut.TotalOut;
+                    index++;
+                }
             }
 
             streamOut.Flush();
