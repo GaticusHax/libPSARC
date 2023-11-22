@@ -29,6 +29,7 @@ namespace cliPSARC {
             { "q",  "quiet" },
             { "y",  "overwrite" },
             { "x",  "file" },
+            { "n",  "no-errors" },
         };
 
         private static string GetExecutableName() => Path.GetFileNameWithoutExtension( Environment.GetCommandLineArgs()[0] );
@@ -69,6 +70,7 @@ namespace cliPSARC {
                    "      --output=DIR      The directory where files will be extracted to.\n" +
                    "                        If not specified, then <OutputDir> is used.\n" +
                    "                        If neither are specified, the current directory is used.\n" +
+                   "  -n, --no-errors       Continue extracting files even if an error occurs.\n" +
                    "  -xFILE, --file=FILE   Extract a specific file. This option can be used multiple times.\n"
             ;
         }
@@ -135,14 +137,25 @@ namespace cliPSARC {
             }
         }
 
-        internal static void ArchiveExtractFiles( string archiveFile, string baseDir, List<string> files ) {
+        internal static void ArchiveExtractFiles( string archiveFile, string baseDir, List<string> files, bool ignoreErrors ) {
             using ( var fIn = new FileStream( archiveFile, FileMode.Open, FileAccess.Read ) ) {
                 var archive = new PSARC.Archive( fIn );
 
                 // if no files were specified then extract all
                 if ( files.Count == 0 ) foreach ( var path in archive.filePaths ) files.Add( path );
 
-                foreach ( var file in files ) ArchiveExtractFile( archive, fIn, baseDir, file );
+                foreach ( var file in files ) {
+                    try {
+                        ArchiveExtractFile( archive, fIn, baseDir, file );
+                    } catch (Exception e) {
+                        if ( !ignoreErrors ) {
+                            throw e;
+                        } else {
+                            LogInfo( $"Error extracting {file}" );
+                        }
+
+                    }
+                }
             }
         }
 
@@ -153,7 +166,7 @@ namespace cliPSARC {
             FileMode fileMode = overwrite ? FileMode.Create : FileMode.CreateNew;
             using ( var fOut = new FileStream( filePath, fileMode, FileAccess.Write ) ) {
                 LogInfo( $"extracting {file}" );
-                archive.ExtractFile( streamIn, file, fOut );
+                archive.ExtractFile( file, fOut );
                 if ( exists ) LogOverwriteFile( filePath );
             }
         }
@@ -237,9 +250,11 @@ namespace cliPSARC {
                     var files = ReadFileList( options.GetOption( "input" ) );
                     files.AddRange( options.GetOptions( "file" ) );
 
+                    bool ignoreErrors = options.GetOption( "no-errors" ) != null;
+
                     if ( options.Count != 0 ) return ShowError( ErrorCode.InvalidArgument );
 
-                    ArchiveExtractFiles( archiveFile, baseDir, files );
+                    ArchiveExtractFiles( archiveFile, baseDir, files, ignoreErrors );
                 }
 
             } catch ( PSARC.InvalidArchiveException ) {
